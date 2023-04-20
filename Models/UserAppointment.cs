@@ -274,8 +274,7 @@ namespace Appointment.Models
         }
         public bool ChangePassword(int UserId, string NewPassword)
         {
-            Console.WriteLine("Model " + UserId);
-
+            
             //Using stored Procedures
             using (SqlConnection connect = new SqlConnection("Data Source=5CG9441HWP;Initial Catalog=Appointment Scheduler;Integrated Security=True;Encrypt=False;"))
             {
@@ -301,7 +300,7 @@ namespace Appointment.Models
 
         public bool CheckPassword(int UserId, string CurrentPassword)
         {
-            Console.WriteLine("Model " + UserId);
+            
 
             //Using stored Procedures
             using (SqlConnection connect = new SqlConnection("Data Source=5CG9441HWP;Initial Catalog=Appointment Scheduler;Integrated Security=True;Encrypt=False;"))
@@ -323,6 +322,39 @@ namespace Appointment.Models
                         {
                             return true;
                         }
+                    }
+                }
+                connect.Close();
+                return false;
+            }
+        }
+
+        public bool AddAppointment(AppointmentModel appointment)
+        {
+
+            //Using stored Procedures
+            using (SqlConnection connect = new SqlConnection("Data Source=5CG9441HWP;Initial Catalog=Appointment Scheduler;Integrated Security=True;Encrypt=False;"))
+            {
+                connect.Open();
+
+                using (SqlCommand command = new SqlCommand("AddAppointments", connect))
+                {
+                    command.CommandType = System.Data.CommandType.StoredProcedure;
+                    command.Parameters.Add("@AppointmentTitle", System.Data.SqlDbType.NChar).Value = appointment.AppointmentTitle;
+                    command.Parameters.Add("@AppointmentDesc", System.Data.SqlDbType.NChar).Value = appointment.AppointmentDescription;
+                    command.Parameters.Add("@AppointmentType", System.Data.SqlDbType.NChar).Value = appointment.AppointmentType;
+                    command.Parameters.Add("@AppointmentDate", System.Data.SqlDbType.NChar).Value = appointment.AppointmentDate;
+                    command.Parameters.Add("@AppointmentTime", System.Data.SqlDbType.NChar).Value = appointment.AppointmentTime;
+                    command.Parameters.Add("@Duration", System.Data.SqlDbType.NChar).Value = appointment.Duration;
+                    command.Parameters.Add("@SetReminder", System.Data.SqlDbType.Bit).Value = appointment.SetReminder;
+                    command.Parameters.Add("@UserId", System.Data.SqlDbType.Int).Value = appointment.UserId;
+                    command.Parameters.Add("@AppointmentStatus", System.Data.SqlDbType.NChar).Value = "Scheduled";
+
+                    int rowsAffected = command.ExecuteNonQuery();
+
+                    if (rowsAffected > 0)
+                    {
+                        return true;
                     }
                 }
                 connect.Close();

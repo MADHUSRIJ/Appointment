@@ -25,6 +25,14 @@
 
         // Add the 'active' class to the corresponding tab in the sidebar
         $('#sidebar a[href="' + activeTab + '"]').addClass('active');
+        // Get the "OK" button element
+        var okButton = document.getElementById("okBtn");
+
+        // Add a click event listener to the "OK" button
+        okButton.addEventListener("click", function () {
+            // Perform an action when the "OK" button is clicked
+            alert("You clicked the OK button!");
+        });
     </script>
 
 }
@@ -221,6 +229,10 @@
             color: rgba(176, 162, 255, 0.49);
             box-shadow: 0px 0px 10px rgba(176, 162, 255, 0.49);
         }
+
+    textarea {
+        overflow-y: auto;
+    }
 </style>
 
 <div class="sidebar">
@@ -320,7 +332,7 @@
                             </div>
                         </div>
                         <div class="col-md-2" style="">
-                            <div class=""  style="margin-bottom:2em;>
+                            <div class="" style="margin-bottom:2em;">
                                 @if (appointments.SetReminder)
                                 {
                                     <i class="bi bi-alarm-fill" style="color:rgba(96, 89, 190, 0.97);font-size:20px"></i>
@@ -594,7 +606,73 @@
     </div>
     <div id="add-new-appointment" class="view Content">
         <h3 class="content-title">Add New Appointment</h3>
-        <!-- Add New Appointment view content here -->
+        <div class="row loginContainer">
+            <div class="col-md-4 loginContent" style="width:70em;margin-left:5em;">
+                <p style="color:rgba(0, 95, 167, 1);" class="fw-bold"><i style="color:rgba(0, 95, 167, 1);" class="bi bi-balloon-heart-fill"></i>Appointy</p>
+                <h6 style="color:rgba(98, 98, 98, 0.8)" class="fw-lighter">Add New Appointment.</h6>
+                <hr />
+                <form asp-action="AddAppointment" method="post" class="form-horizontal">
+
+                    <div asp-validation-summary="All" class="text-danger"></div>
+
+                    <div class="form-group textField">
+                        <label asp-for="AppointmentTitle" class="control-label Label">Appointment Title</label>
+                        <textArea type="text" asp-for="AppointmentTitle" class="form-control" maxlength="100" rows="4" style="max-height: 50px;"></textArea>
+                        <span asp-validation-for="AppointmentTitle" class="text-danger"></span>
+                    </div>
+                    <div class="form-group textField">
+                        <label asp-for="AppointmentDescription" class="control-label Label">Appointment Description</label>
+                        <textArea type="text" asp-for="AppointmentDescription" class="form-control"  maxlength="500" rows="10" style="max-height: 200px;"></textArea>
+                        <span asp-validation-for="AppointmentDescription" class="text-danger"></span>
+                    </div>
+                    <div class="form-group textField">
+                        <label asp-for="AppointmentType" class="control-label Label">Appointment Type</label>
+                        <select id="AppointmentType" name="AppointmentType" asp-for="AppointmentType" class="form-control">
+                            <option value="Personal">Personal</option>
+                            <option value="Business">Business</option>
+                            <option value="Legal">Legal</option>
+                            <option value="Medical">Medical</option>
+                            <option value="Fitness">Fitness</option>
+                            <option value="Social">Social</option>
+                            <option value="Other">Other</option>
+                        </select>
+                        <span asp-validation-for="AppointmentType" class="text-danger"></span>
+                    </div>
+                    <div class="form-group textField">
+                        <label asp-for="AppointmentDate" class="control-label Label">Appointment Date</label>
+                        <input type="date" asp-for="AppointmentDate" class="form-control" />
+                        <span asp-validation-for="AppointmentDate" class="text-danger"></span>
+                    </div>
+                    <div class="form-group textField">
+                        <label asp-for="AppointmentTime" class="control-label Label">Appointment Time</label>
+                        <input type="time" asp-for="AppointmentTime" class="form-control" />
+                        <span asp-validation-for="AppointmentTime" class="text-danger"></span>
+                    </div>
+                    <div class="form-group textField">
+                        <label asp-for="Duration" class="control-label Label">Duration</label>
+                        <select id="Duration" name="Duration" asp-for="Duration" class="form-control">
+                            <option value="30 minutes">30 minutes</option>
+                            <option value="1 hour">1 hour</option>
+                            <option value="1 hour 30 minutes">1 hour 30 minutes</option>
+                            <option value="2 hours">2 hours</option>
+                            <option value="More than 2 hours">More than 2 hours</option>
+                        </select>
+                        <span asp-validation-for="Duration" class="text-danger"></span>
+                    </div>
+                    <div class=”form-group textField”>
+                        <label asp-for="SetReminder" class="control-label Label">Set a reminder:</label>
+                        <input type="checkbox" id="SetReminder" name="SetReminder" asp-for="SetReminder">
+                    </div>
+                    <div class="form-group Buttons">
+                        <button type="submit" class="btn" style="width:200px;margin-top:0.5em;">Submit</button>
+                    </div>
+
+
+                </form>
+            </div>
+        </div>
     </div>
 
 </div>
+
+
