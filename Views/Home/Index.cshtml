@@ -16,11 +16,20 @@
                 }
             });
         });
+
+        // Get the current URL path and split it into an array of segments
+        var path = window.location.pathname.split('/');
+
+        // Get the last segment, which should be the active tab name
+        var activeTab = path[path.length - 1];
+
+        // Add the 'active' class to the corresponding tab in the sidebar
+        $('#sidebar a[href="' + activeTab + '"]').addClass('active');
     </script>
 
 }
 
-@model AppointmentModel;
+@model UserAppointment;
 
 <style>
     .sidebar {
@@ -168,6 +177,33 @@
         font-weight: bold;
     }
 
+    .loginContainer {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .loginContent {
+        background-color: rgba(253, 230, 255, 0.8);
+        border: 1px solid rgba(252, 210, 255, 0.8);
+        box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        width: 30em;
+        padding: 3em;
+        border-radius: 10px;
+        margin-top: 3em;
+    }
+
+    .textField {
+        margin-left: 2em;
+        margin-right: 2em;
+        margin-bottom: 1em;
+    }
+
+    .Label {
+        margin-bottom: 1em;
+        color: rgba(0, 95, 167, 1);
+    }
+
     .btn {
         background-color: rgba(176, 162, 255, 0.49);
         color: rgba(99, 76, 221, 0.49);
@@ -222,6 +258,12 @@
                 Your Profile
             </a>
         </li>
+        <li class="sidebar-item">
+            <a href="#change-password" class="sidebar-link">
+                <i class="bi bi-key-fill sidebar-title"></i>
+                Change Password
+            </a>
+        </li>
         <li class="sidebar-item appointment-item">
             <a href="#add-new-appointment" class="sidebar-link appointment-link">
 
@@ -234,6 +276,12 @@
 <div class="main-content">
     <div id="today" class="view active Content">
         <h3 class="content-title">Today's Appointments</h3>
+        @if (ViewBag.TodayAppointments == null)
+        {
+            <div>
+                No Appointments Scheduled Today! Have Fun! Wohooo!
+            </div>
+        }
         @if (ViewBag.TodayAppointments != null)
         {
             @foreach (var appointments in ViewBag.TodayAppointments)
@@ -263,27 +311,24 @@
                                 <div class="col-md-3">
                                     <p>Date - @appointments.AppointmentDate </p>
                                 </div>
-                                <div class="col-md-3">
+                                <div class="col-md-4">
                                     Time - @appointments.AppointmentTime
                                 </div>
-                                <div class="col-md-4">
+                                <div class="col-md-5">
                                     Duration - @appointments.Duration
-                                </div>
-                                <div class="col-md-2">
-                                    @if (appointments.SetReminder)
-                                    {
-                                        <i class="bi bi-alarm-fill" style="color:rgba(96, 89, 190, 0.97);font-size:20px"></i>
-                                    }
-                                    @if (!appointments.SetReminder)
-                                    {
-                                    <i class="bi bi-alarm" style="color:rgba(96, 89, 190, 0.97);font-size:20px"></i>
-                                    }
                                 </div>
                             </div>
                         </div>
                         <div class="col-md-2" style="">
-                            <div class="appointment-options">
-                                <button class="btn"><i class="bi bi-eye-fill" style="margin-right:0.5em;"></i>View</button>
+                            <div class=""  style="margin-bottom:2em;>
+                                @if (appointments.SetReminder)
+                                {
+                                    <i class="bi bi-alarm-fill" style="color:rgba(96, 89, 190, 0.97);font-size:20px"></i>
+                                }
+                                @if (!appointments.SetReminder)
+                                {
+                                    <i class="bi bi-alarm" style="color:rgba(96, 89, 190, 0.97);font-size:20px"></i>
+                                }
                             </div>
                             <div class="appointment-options">
                                 <button class="btn"><i class="bi bi-pencil-fill" style="margin-right:0.5em;"></i>Edit</button>
@@ -296,6 +341,7 @@
                 </div>
             }
         }
+
         
     </div>
     <div id="upcoming" class="view Content">
@@ -329,27 +375,25 @@
                                 <div class="col-md-3">
                                     <p>Date - @appointments.AppointmentDate </p>
                                 </div>
-                                <div class="col-md-3">
+                                <div class="col-md-4">
                                     Time - @appointments.AppointmentTime
                                 </div>
-                                <div class="col-md-4">
+                                <div class="col-md-5">
                                     Duration - @appointments.Duration
                                 </div>
-                                <div class="col-md-2">
-                                    @if (appointments.SetReminder)
-                                    {
-                                        <i class="bi bi-alarm-fill" style="color:rgba(96, 89, 190, 0.97);font-size:20px"></i>
-                                    }
-                                    @if (!appointments.SetReminder)
-                                    {
-                                        <i class="bi bi-alarm" style="color:rgba(96, 89, 190, 0.97);font-size:20px"></i>
-                                    }
-                                </div>
+                                
                             </div>
                         </div>
                         <div class="col-md-2" style="">
-                            <div class="appointment-options">
-                                <button class="btn"><i class="bi bi-eye-fill" style="margin-right:0.5em;"></i>View</button>
+                            <div class="" style="margin-bottom:2em;">
+                                @if (appointments.SetReminder)
+                                {
+                                    <i class="bi bi-alarm-fill" style="color:rgba(96, 89, 190, 0.97);font-size:20px"></i>
+                                }
+                                @if (!appointments.SetReminder)
+                                {
+                                    <i class="bi bi-alarm" style="color:rgba(96, 89, 190, 0.97);font-size:20px"></i>
+                                }
                             </div>
                             <div class="appointment-options">
                                 <button class="btn"><i class="bi bi-pencil-fill" style="margin-right:0.5em;"></i>Edit</button>
@@ -362,9 +406,15 @@
                 </div>
             }
         }
+        @if (ViewBag.UpcomingAppointments == null)
+        {
+            <div>
+                No Appointments Scheduled! Have Fun! Wohooo!</div>
+        }
     </div>
     <div id="completed" class="view Content">
         <h3 class="content-title">Completed Appointments</h3>
+
         @if (ViewBag.CompletedAppointments != null)
         {
             @foreach (var appointments in ViewBag.CompletedAppointments)
@@ -409,6 +459,12 @@
                     </div>
                 </div>
             }
+        }
+        @if (ViewBag.CompletedAppointments == null)
+        {
+            <div>
+                No Completed Appointments!
+            </div>
         }
     </div>
     <div id="cancelled" class="view Content">
@@ -457,10 +513,84 @@
                 </div>
             }
         }
+        @if (ViewBag.CancelledAppointments == null)
+        {
+            <div>
+                No Cancelled Appointments!
+            </div>
+        }
     </div>
     <div id="your-profile" class="view Content">
         <h3 class="content-title">Your Profile</h3>
-        <!-- Add New Appointment view content here -->
+        <div class="row loginContainer">
+            <div class="col-md-4 loginContent">
+                <p style="color:rgba(0, 95, 167, 1);" class="fw-bold"><i style="color:rgba(0, 95, 167, 1);" class="bi bi-balloon-heart-fill"></i>Appointy</p>
+                <h6 style="color:rgba(98, 98, 98, 0.8)" class="fw-lighter">Edit Your Profile.</h6>
+                <hr />
+                <form asp-action="EditProfile" method="post" class="form-horizontal">
+
+                    <div asp-validation-summary="All" class="text-danger"></div>
+
+                    <div class="form-group textField">
+                        <label asp-for="UserName" class="control-label Label">User Name</label>
+                        <input type="text" asp-for="UserName" class="form-control" value="@ViewBag.users.UserName" />
+                        <span asp-validation-for="UserName" class="text-danger"></span>
+                    </div>
+                    <div class="form-group textField">
+                        <label asp-for="Name" class="control-label Label">Name</label>
+                        <input type="text" asp-for="Name" class="form-control" value="@ViewBag.users.Name" />
+                        <span asp-validation-for="Name" class="text-danger"></span>
+                    </div>
+                    <div class="form-group textField">
+                        <label asp-for="Email" class="control-label Label">Email</label>
+                        <input type="text" asp-for="Email" class="form-control" value="@ViewBag.users.Email" />
+                        <span asp-validation-for="Email" class="text-danger"></span>
+                    </div>
+                    <div class="form-group textField">
+                        <label asp-for="MobileNumber" class="control-label Label">Mobile Number</label>
+                        <input type="text" asp-for="MobileNumber" class="form-control" value="@ViewBag.users.MobileNumber" />
+                        <span asp-validation-for="MobileNumber" class="text-danger"></span>
+                    </div>
+                    <div class="form-group Buttons">
+                        <button type="submit" class="btn" style="width:200px;margin-top:0.5em;">Update Profile</button>
+                    </div>
+
+
+                </form>
+            </div>
+        </div>
+    </div>
+
+
+    <div id="change-password" class="view Content">
+        <h3 class="content-title">Change Password</h3>
+        <div class="row loginContainer">
+            <div class="col-md-4 loginContent">
+                <p style="color:rgba(0, 95, 167, 1);" class="fw-bold"><i style="color:rgba(0, 95, 167, 1);" class="bi bi-balloon-heart-fill"></i>Appointy</p>
+                <h6 style="color:rgba(98, 98, 98, 0.8)" class="fw-lighter">Change Password for better security.</h6>
+                <hr />
+                <form asp-action="ChangePassword" method="post" class="form-horizontal">
+
+                    <div asp-validation-summary="All" class="text-danger"></div>
+                    
+                    <div class="form-group textField">
+                        <label asp-for="Password" class="control-label Label">Password</label>
+                        <input type="text" asp-for="Password" class="form-control" />
+                        <span asp-validation-for="Password" class="text-danger"></span>
+                    </div>
+                    <div class="form-group textField">
+                        <label asp-for="ConfirmPassword" class="control-label Label">New Password</label>
+                        <input type="text" asp-for="ConfirmPassword" class="form-control" />
+                        <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+                    </div>
+                    <div class="form-group Buttons">
+                        <button type="submit" class="btn" style="width:200px;margin-top:0.5em;">Change Password</button>
+                    </div>
+
+
+                </form>
+            </div>
+        </div>
     </div>
     <div id="add-new-appointment" class="view Content">
         <h3 class="content-title">Add New Appointment</h3>

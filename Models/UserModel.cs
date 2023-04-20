@@ -7,15 +7,16 @@ namespace Appointment.Models
     {
 
         [Key]
-        [Required]
+       
         public int UserId { get; set; }
 
-        [Required]
+       
         public string? UserName { get; set; }
 
-        [Required]
+       
         public string? Password { get; set; }
 
+       
         public string? Name { get; set; }
 
 
@@ -23,7 +24,7 @@ namespace Appointment.Models
 
         public string? MobileNumber { get; set; }
 
-        [Required]
+       
         public bool RememberMe { get; set; }
 
 
@@ -49,8 +50,10 @@ namespace Appointment.Models
                         this.Email = (string)reader["Email"];
                         this.Name = (string)reader["Name"];
                         this.MobileNumber = (string)reader["MobileNumber"];
+                        this.Name = (string)reader["Name"];
 
-                        Console.WriteLine("Inside Verify User " + this.UserName);
+
+                        Console.WriteLine("Inside Verify User " + this.Name);
 
                         // Erasing the password.
                         this.Password = (string)reader["Password"];

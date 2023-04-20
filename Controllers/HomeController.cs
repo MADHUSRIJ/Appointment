@@ -11,6 +11,7 @@ namespace Appointment.Controllers
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
+        public static UserAppointment users { get; set; }
         List<AppointmentModel>? TodayAppointments;
         List<AppointmentModel>? UpcomingAppointments;
         List<AppointmentModel>? CompletedAppointments;
@@ -25,13 +26,28 @@ namespace Appointment.Controllers
         {
             try
             {
+                UserAppointment user = getCurrentUser();
+                Console.WriteLine("User " + user.UserName);
+                Console.WriteLine(user.UserId);
+                ViewBag.users = user;
+                if (user != null)
+                {
+                    Console.WriteLine("User " + user.UserName);
+                    Console.WriteLine("Current user: ID = " + user.UserId + ", Name = " + user.UserName);
+                    // Add code here to set ViewBag properties using the user object
+                    user.SetUser(user.UserId);
+                    UserAppointment appointmentModel = new UserAppointment();
+                    ViewBag.TodayAppointments = user.GetTodayAppointments(user.UserId);
+                    ViewBag.UpcomingAppointments = appointmentModel.GetUpcomingAppointments(user.UserId);
+                    ViewBag.CompletedAppointments = appointmentModel.GetCompletedAppointments(user.UserId);
+                    ViewBag.CancelledAppointments = appointmentModel.GetCancelledAppointments(user.UserId);
+                }
+                else
+                {
+                    Console.WriteLine("Current user is null");
+                }
+               
                 
-                UserModel user1 = getCurrentUser();
-                AppointmentModel appointmentModel = new AppointmentModel();
-                ViewBag.TodayAppointments = appointmentModel.GetTodayAppointments(user1.UserId);
-                ViewBag.UpcomingAppointments = appointmentModel.GetUpcomingAppointments(user1.UserId);
-                ViewBag.CompletedAppointments = appointmentModel.GetCompletedAppointments(user1.UserId);
-                ViewBag.CancelledAppointments = appointmentModel.GetCancelledAppointments(user1.UserId);
 
 
             }
@@ -47,7 +63,7 @@ namespace Appointment.Controllers
             return View();
         }
 
-        private UserModel getCurrentUser()
+        private UserAppointment getCurrentUser()
         {
             try
             {
@@ -66,7 +82,7 @@ namespace Appointment.Controllers
                     string userid = (userClaims.FirstOrDefault(o => o.Type == ClaimTypes.Sid)?.Value);
                     string username = userClaims.FirstOrDefault(o => o.Type == ClaimTypes.Name)?.Value;
                     Console.WriteLine("Get curr user " + userid + " name " + username);
-                    return new UserModel
+                    return new UserAppointment
                     {
                         UserName = userClaims.FirstOrDefault(o => o.Type == ClaimTypes.Name)?.Value,
                         UserId = Convert.ToInt32((userClaims.FirstOrDefault(o => o.Type == ClaimTypes.Sid)?.Value)),
@@ -80,6 +96,61 @@ namespace Appointment.Controllers
                 Console.WriteLine("Get current user controller " + ex.Message);
             }
             return null;
+        }
+
+
+        [HttpPost("ChangePassword")]
+        public ActionResult ChangePassword(UserAppointment userAppointment)
+        {
+            string CurrentPassword = Request.Form["Password"]!;
+            string NewPassword = Request.Form["ConfirmPassword"]!;
+
+            UserAppointment appointmentModel = new UserAppointment();
+
+            if (appointmentModel.CheckPassword(users.UserId, CurrentPassword))
+            {
+                if (appointmentModel.ChangePassword(users.UserId, NewPassword))
+                {
+                    ViewData["Message"] = "Password Changed Sucessfully";
+                   
+                }
+                else
+                {
+                    ViewData["Message"] = "Check Your New Password";
+                }
+            }
+            else
+            {
+                Console.WriteLine("else");
+                ViewData["Message"] = "Incorrect Old Password";
+            }
+
+            return RedirectToAction("Index", "Home");
+        }
+
+        [HttpPost("EditProfile")]
+        public ActionResult UpdateProfile(UserAppointment userAppointment)
+        {
+            string CurrentPassword = Request.Form["Password"]!;
+            string NewPassword = Request.Form["ConfirmPassword"]!;
+
+            UserAppointment appointmentModel = new UserAppointment();
+
+           
+
+            return RedirectToAction("Index", "Home");
+        }
+
+        [HttpPost("AddAppointment")]
+        public ActionResult AddAppointmeny(UserAppointment userAppointment)
+        {
+      
+
+            UserAppointment appointmentModel = new UserAppointment();
+
+
+
+            return RedirectToAction("Index", "Home");
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
