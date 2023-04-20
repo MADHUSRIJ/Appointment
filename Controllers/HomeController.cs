@@ -177,7 +177,8 @@ namespace Appointment.Controllers
 
 
             UserAppointment appointmentModel = new UserAppointment();
-            appointmentModel.AddAppointment(appointment);
+            Console.WriteLine("Appointment mobile "+users.MobileNumber);
+            appointmentModel.AddAppointment(appointment,users.MobileNumber!);
 
 
             return RedirectToAction("Index", "Home");

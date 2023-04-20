@@ -1,6 +1,12 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
 using Microsoft.Data.SqlClient;
+using Twilio;
+using Twilio.Types;
+using Twilio.Rest.Api.V2010.Account;
+using Twilio.Rest.Verify.V2.Service;
+using Microsoft.AspNetCore.Http;
+using System.Globalization;
 
 namespace Appointment.Models
 {
@@ -31,28 +37,28 @@ namespace Appointment.Models
         // Appointments Model
         public int AppointmentId { get; set; }
 
-       
+
         public string? AppointmentTitle { get; set; }
 
-       
+
         public string? AppointmentDescription { get; set; }
 
-       
+
         public string? AppointmentType { get; set; }
 
-       
+
         public string? AppointmentDate { get; set; }
 
-       
+
         public string? AppointmentTime { get; set; }
 
-       
+
         public string? Duration { get; set; }
 
-       
+
         public string? AppointmentStatus { get; set; }
 
-       
+
         public bool SetReminder { get; set; }
 
         public bool SetUser(int UserId)
@@ -119,13 +125,13 @@ namespace Appointment.Models
                         appointmentModel.UserId = UserId;
                         appointmentModel.SetReminder = (bool)reader["SetReminder"];
 
-                       
+
                         TodayAppointments!.Add(appointmentModel);
                     }
                     reader.Close();
                 }
                 connect.Close();
-               if(TodayAppointments.Count > 0)
+                if (TodayAppointments.Count > 0)
                 {
                     return TodayAppointments;
                 }
@@ -134,7 +140,7 @@ namespace Appointment.Models
         }
         public List<AppointmentModel> GetUpcomingAppointments(int UserId)
         {
-            
+
             List<AppointmentModel>? UpcomingAppointments = new List<AppointmentModel>();
 
             //Using stored Procedures
@@ -163,13 +169,13 @@ namespace Appointment.Models
                         appointmentModel.UserId = UserId;
                         appointmentModel.SetReminder = (bool)reader["SetReminder"];
 
-                       
+
                         UpcomingAppointments!.Add(appointmentModel);
                     }
                     reader.Close();
                 }
                 connect.Close();
-                if(UpcomingAppointments.Count > 0)
+                if (UpcomingAppointments.Count > 0)
                 {
                     return UpcomingAppointments;
                 }
@@ -181,7 +187,7 @@ namespace Appointment.Models
         }
         public List<AppointmentModel> GetCompletedAppointments(int UserId)
         {
-           
+
             List<AppointmentModel>? CompletedAppointments = new List<AppointmentModel>();
 
             //Using stored Procedures
@@ -210,13 +216,13 @@ namespace Appointment.Models
                         appointmentModel.UserId = UserId;
                         appointmentModel.SetReminder = (bool)reader["SetReminder"];
 
-                       
+
                         CompletedAppointments!.Add(appointmentModel);
                     }
                     reader.Close();
                 }
                 connect.Close();
-                if(CompletedAppointments.Count > 0)
+                if (CompletedAppointments.Count > 0)
                 {
                     return CompletedAppointments;
                 }
@@ -228,7 +234,7 @@ namespace Appointment.Models
         }
         public List<AppointmentModel> GetCancelledAppointments(int UserId)
         {
-           List<AppointmentModel>? CancelledAppointments = new List<AppointmentModel>();
+            List<AppointmentModel>? CancelledAppointments = new List<AppointmentModel>();
 
             //Using stored Procedures
             using (SqlConnection connect = new SqlConnection("Data Source=5CG9441HWP;Initial Catalog=Appointment Scheduler;Integrated Security=True;Encrypt=False;"))
@@ -256,13 +262,13 @@ namespace Appointment.Models
                         appointmentModel.UserId = UserId;
                         appointmentModel.SetReminder = (bool)reader["SetReminder"];
 
-                      
+
                         CancelledAppointments!.Add(appointmentModel);
                     }
                     reader.Close();
                 }
                 connect.Close();
-               if(CancelledAppointments.Count > 0)
+                if (CancelledAppointments.Count > 0)
                 {
                     return CancelledAppointments;
                 }
@@ -274,7 +280,7 @@ namespace Appointment.Models
         }
         public bool ChangePassword(int UserId, string NewPassword)
         {
-            
+
             //Using stored Procedures
             using (SqlConnection connect = new SqlConnection("Data Source=5CG9441HWP;Initial Catalog=Appointment Scheduler;Integrated Security=True;Encrypt=False;"))
             {
@@ -287,8 +293,8 @@ namespace Appointment.Models
                     command.Parameters.Add("@NewPass", System.Data.SqlDbType.NChar).Value = NewPassword;
 
                     int rowsAffected = command.ExecuteNonQuery();
-                   
-                    if(rowsAffected > 0)
+
+                    if (rowsAffected > 0)
                     {
                         return true;
                     }
@@ -300,7 +306,7 @@ namespace Appointment.Models
 
         public bool CheckPassword(int UserId, string CurrentPassword)
         {
-            
+
 
             //Using stored Procedures
             using (SqlConnection connect = new SqlConnection("Data Source=5CG9441HWP;Initial Catalog=Appointment Scheduler;Integrated Security=True;Encrypt=False;"))
@@ -312,9 +318,9 @@ namespace Appointment.Models
                     command.CommandType = System.Data.CommandType.StoredProcedure;
                     command.Parameters.Add("@UserId", System.Data.SqlDbType.Int).Value = UserId;
 
-                   SqlDataReader reader = command.ExecuteReader();
+                    SqlDataReader reader = command.ExecuteReader();
 
-                   
+
 
                     if (reader.Read())
                     {
@@ -329,7 +335,7 @@ namespace Appointment.Models
             }
         }
 
-        public bool AddAppointment(AppointmentModel appointment)
+        public bool AddAppointment(AppointmentModel appointment, string MobileNumber)
         {
 
             //Using stored Procedures
@@ -354,6 +360,41 @@ namespace Appointment.Models
 
                     if (rowsAffected > 0)
                     {
+                        TwilioClient.Init("ACc98ecc30d2270c1fe6b989b31ef9d22e", "8f50c4fd3b4a465581c70d716a519db5");
+
+                        // Construct the SMS message body
+                        string messageBody = "You have an appointment for " + appointment.AppointmentTitle + " on " + appointment.AppointmentDate + " at " + appointment.AppointmentTime;
+
+
+
+                        try
+                        {
+                            string dateTimeString = appointment.AppointmentDate + " " + appointment.AppointmentTime; // Combine the date and time strings
+                            DateTime sendAtTime = DateTime.ParseExact(dateTimeString, "dd MMM yyyy HH:mm:ss", CultureInfo.InvariantCulture);
+
+                            //DateTime sendAtTime = new DateTime(2023, 04, 21, 00, 40, 0); // April 22, 2023 at 12:00:00 PM
+
+                            // Send the SMS reminder using the Twilio API
+                            MessageResource.Create(
+                                            to: new PhoneNumber("+91" + MobileNumber),
+                                            from: new PhoneNumber("+16204079346"),
+                                            body: messageBody
+
+                                        );
+                            var messageOptions = new CreateMessageOptions(
+                                    new PhoneNumber("+91" + MobileNumber)
+                                )
+                            {
+                                From = new PhoneNumber("+16204079346"),
+                                Body = messageBody,
+                                SendAt = sendAtTime
+                            };
+
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine("Message Create" + ex.Message);
+                        }
                         return true;
                     }
                 }

@@ -91,7 +91,7 @@ namespace Appointment.Controllers
         public IActionResult Register()
         {
 
-            return View();
+            return View("Register","Account");
         }
 
         [HttpPost]
