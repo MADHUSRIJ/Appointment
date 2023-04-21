@@ -1,5 +1,9 @@
 ﻿using Microsoft.Data.SqlClient;
 using System.ComponentModel.DataAnnotations;
+using System.Globalization;
+using Twilio.Types;
+using Twilio;
+using Twilio.Rest.Api.V2010.Account;
 
 namespace Appointment.Models
 {
@@ -68,5 +72,60 @@ namespace Appointment.Models
             }
             return false;
         }
+
+        public bool RegisterUser(UserModel user)
+        {
+
+            //Using stored Procedures
+            using (SqlConnection connect = new SqlConnection("Data Source=5CG9441HWP;Initial Catalog=Appointment Scheduler;Integrated Security=True;Encrypt=False;"))
+            {
+                connect.Open();
+
+                using (SqlCommand command = new SqlCommand("RegisterUser", connect))
+                {
+                    command.CommandType = System.Data.CommandType.StoredProcedure;
+                    command.Parameters.Add("@UserName", System.Data.SqlDbType.NChar).Value = user.UserName;
+                    command.Parameters.Add("@Password", System.Data.SqlDbType.NChar).Value = user.Password;
+                    command.Parameters.Add("@Email", System.Data.SqlDbType.NChar).Value = user.Email;
+                    command.Parameters.Add("@Name", System.Data.SqlDbType.NChar).Value = user.Name;
+                    command.Parameters.Add("@Mobile", System.Data.SqlDbType.NChar).Value = user.MobileNumber;
+
+                    int rowsAffected = command.ExecuteNonQuery();
+
+                    if (rowsAffected > 0)
+                    {
+                        TwilioClient.Init("ACc98ecc30d2270c1fe6b989b31ef9d22e", "8f50c4fd3b4a465581c70d716a519db5");
+
+                        // Construct the SMS message body
+                        string messageBody = "You have successfully registered into your Appointy";
+
+
+
+                        try
+                        {
+                            
+                            // Send the SMS reminder using the Twilio API
+                            MessageResource.Create(
+                                            to: new PhoneNumber("+91" + MobileNumber),
+                                            from: new PhoneNumber("+16204079346"),
+                                            body: messageBody
+
+                                        );
+                           
+
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine("Message Create" + ex.Message);
+                        }
+                        return true;
+                    }
+                }
+                connect.Close();
+                return false;
+            }
+        }
+
+
     }
 }

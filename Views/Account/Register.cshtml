@@ -5,49 +5,101 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h1>Register</h1>
 
-<h4>UserModel</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Register">
+<style>
+    .loginContainer {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .loginContent {
+        background-color: rgba(253, 230, 255, 0.8);
+        border: 1px solid rgba(252, 210, 255, 0.8);
+        box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        width: 30em;
+        padding: 3em;
+        border-radius: 10px;
+        margin-top: 5em;
+    }
+
+    .textField {
+        margin-left: 2em;
+        margin-right: 2em;
+        margin-bottom: 1em;
+    }
+
+    .Label {
+        margin-bottom: 1em;
+        color: rgba(0, 95, 167, 1);
+    }
+
+    .btn {
+        background-color: rgba(0, 95, 167, 1);
+        color: #fff;
+        border-radius: 5px;
+        padding: 10px 50px;
+        font-size: 1em;
+        border: none;
+        transition: all 0.3s ease-in-out;
+    }
+
+        .btn:hover {
+            background-color: #fff;
+            color: rgba(0, 95, 167, 1);
+            box-shadow: 0px 0px 10px rgba(0, 95, 167, 1);
+        }
+
+    .Buttons {
+        display: flex;
+        justify-content: space-evenly;
+        align-items: center;
+        margin-top: 3em;
+    }
+</style>
+
+<div class="row loginContainer">
+    <div class="col-md-4 loginContent">
+        <p style="color:rgba(0, 95, 167, 1);" class="fw-bold"><i style="color:rgba(0, 95, 167, 1);" class="bi bi-balloon-heart-fill"></i>Appointy</p>
+        <h6 style="color:rgba(98, 98, 98, 0.8)" class="fw-lighter">Register your account now to keep up on your schedule.</h6>
+        <hr />
+        <form asp-action="Register" asp-controller="Account" method="post" class="form-horizontal">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="UserName" class="control-label"></label>
+            <div class="form-group textField">
+                <label asp-for="UserName" class="control-label  Label">User Name</label>
                 <input asp-for="UserName" class="form-control" />
                 <span asp-validation-for="UserName" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="Password" class="control-label"></label>
+            <div class="form-group textField">
+                <label asp-for="Password" class="control-label  Label"></label>
                 <input asp-for="Password" class="form-control" />
                 <span asp-validation-for="Password" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="Name" class="control-label"></label>
+            <div class="form-group textField">
+                <label asp-for="Name" class="control-label Label"></label>
                 <input asp-for="Name" class="form-control" />
                 <span asp-validation-for="Name" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="Email" class="control-label"></label>
+            <div class="form-group textField">
+                <label asp-for="Email" class="control-label Label"></label>
                 <input asp-for="Email" class="form-control" />
                 <span asp-validation-for="Email" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="MobileNumber" class="control-label"></label>
+            <div class="form-group textField">
+                <label asp-for="MobileNumber" class="control-label Label">Mobile Number</label>
                 <input asp-for="MobileNumber" class="form-control" />
                 <span asp-validation-for="MobileNumber" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
+            <div class="form-group Buttons">
+                <button type="submit" class="btn">Register</button>
+                <a asp-controller="Account" asp-action="Login" class="btn">Login</a>
             </div>
+           
         </form>
     </div>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
+<
 
 @section Scripts {
     @{

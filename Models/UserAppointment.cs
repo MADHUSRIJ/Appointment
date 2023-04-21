@@ -370,7 +370,7 @@ namespace Appointment.Models
                         try
                         {
                             string dateTimeString = appointment.AppointmentDate + " " + appointment.AppointmentTime; // Combine the date and time strings
-                            DateTime sendAtTime = DateTime.ParseExact(dateTimeString, "dd MMM yyyy HH:mm:ss", CultureInfo.InvariantCulture);
+                            DateTime sendAtTime = DateTime.ParseExact(dateTimeString, "dd MMM yyyy HH:mm:ss", CultureInfo.InvariantCulture).AddMinutes(-40);
 
                             //DateTime sendAtTime = new DateTime(2023, 04, 21, 00, 40, 0); // April 22, 2023 at 12:00:00 PM
 

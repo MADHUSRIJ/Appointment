@@ -38,6 +38,7 @@ namespace Appointment.Controllers
             {
                 try
                 {
+                    Console.WriteLine("Inside Login Post ");
                     User = user;
                     string token = CreateToken();
                     //Response.Headers.Add("Authorization", "Bearer "+ token);
@@ -90,14 +91,32 @@ namespace Appointment.Controllers
         [HttpGet]
         public IActionResult Register()
         {
-
-            return View("Register","Account");
+            UserModel user = new UserModel();
+            return View(user);
         }
 
         [HttpPost]
         public IActionResult Register(UserModel user)
         {
+            user = new UserModel();
+            user.UserName = Request.Form["UserName"];
+            user.Name = Request.Form["Name"];
+            user.Email = Request.Form["Email"];
+            user.MobileNumber = Request.Form["MobileNumber"];
+            user.Password = Request.Form["Password"];
 
+            bool registered = user.RegisterUser(user);
+
+            if(registered)
+            {
+                User = user;
+                string token = CreateToken();
+                //Response.Headers.Add("Authorization", "Bearer "+ token);
+                Response.Cookies.Append("auth_token", token);
+                return RedirectToAction("Index", "Home");
+            }
+
+            Console.WriteLine("UserNAem "+Request.Form["UserName"]);
             return View();
 
         }
